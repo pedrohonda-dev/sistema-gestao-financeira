@@ -26,7 +26,6 @@ O sistema foi desenvolvido para auxiliar no controle financeiro de uma empresa, 
 
 ## ▶️ Como executar
 
-### 1. Clone o repositório
-
+### 1. Clonar o repositório
 ```bash
 git clone https://github.com/pedrohonda-dev/sistema-gestao-financeira.git
