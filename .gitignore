@@ -1,0 +1,25 @@
+
+# Ambiente virtual Python
+.venv/
+venv/
+
+# Cache do Python
+__pycache__/
+*.py[cod]
+
+# Banco de dados local
+instance/
+*.db
+*.sqlite
+*.sqlite3
+
+# Configurações e segredos
+.env
+.env.*
+!.env.example
+
+# Arquivos do PyCharm
+.idea/
+
+# Logs
+*.log

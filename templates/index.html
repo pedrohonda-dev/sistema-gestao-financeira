@@ -1,0 +1,408 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinancePro | Gestão Financeira</title>
+
+    <style>
+        :root {
+            --bg: #0b1120;
+            --panel: #141e30;
+            --text: #edf3ff;
+            --muted: #91a1bb;
+            --green: #35d39a;
+            --red: #ff7185;
+            --blue: #70a5ff;
+            --border: #2a3952;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 22px 5%;
+            background: #10192a;
+            border-bottom: 1px solid var(--border);
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .brand { font-size: 24px; font-weight: bold; }
+        .brand span { color: var(--green); }
+
+        main { max-width: 1300px; margin: auto; padding: 30px 5%; }
+        h1 { margin-bottom: 8px; }
+        h2 { font-size: 19px; }
+        .muted { color: var(--muted); }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .card, .panel {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 20px;
+            min-width: 0;
+        }
+
+        .card small { display: block; color: var(--muted); margin-bottom: 12px; }
+        .amount { font-size: 24px; font-weight: bold; overflow-wrap: anywhere; }
+        .positive { color: var(--green); }
+        .negative { color: var(--red); }
+
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.6fr) minmax(280px, 1fr);
+            gap: 20px;
+        }
+
+        label { display: block; margin: 13px 0 6px; color: var(--muted); font-size: 13px; }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: #0d1627;
+            color: var(--text);
+            font-size: 14px;
+        }
+
+        textarea { resize: vertical; min-height: 70px; }
+
+        button {
+            padding: 11px 15px;
+            border: 0;
+            border-radius: 8px;
+            background: var(--green);
+            color: #071b15;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover { filter: brightness(1.1); }
+        .full { width: 100%; margin-top: 18px; }
+        .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 500px; }
+        th, td { text-align: left; padding: 13px 8px; border-bottom: 1px solid var(--border); font-size: 13px; }
+        th { color: var(--muted); }
+        .pill { display: inline-block; background: #25344c; border-radius: 20px; padding: 5px 9px; }
+        .empty { padding: 25px 0; color: var(--muted); }
+
+        .alert { padding: 12px; margin: 10px 0; border-radius: 8px; background: #24334a; }
+        .alert.error { border-left: 4px solid var(--red); }
+        .alert.success { border-left: 4px solid var(--green); }
+
+        a { color: var(--blue); text-decoration: none; }
+
+        @media (max-width: 900px) {
+            .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .layout { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 500px) {
+            .cards { grid-template-columns: 1fr 1fr; }
+            main { padding: 20px 4%; }
+            .card, .panel { padding: 14px; }
+            .amount { font-size: 18px; }
+        }
+    </style>
+</head>
+
+<body>
+
+{% if not current_user.is_authenticated %}
+
+    <main style="max-width:450px; margin:45px auto;">
+        <div class="brand">Finance<span>Pro</span></div>
+
+        <section class="panel" style="margin-top:25px;">
+
+            {% if page == 'register' %}
+                <h1>Criar conta</h1>
+                <p class="muted">Comece a organizar suas finanças.</p>
+
+                <form method="POST" action="{{ url_for('register') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <label>Nome</label>
+                    <input name="name" maxlength="100" required>
+
+                    <label>E-mail</label>
+                    <input type="email" name="email" required>
+
+                    <label>Senha (mínimo 8 caracteres)</label>
+                    <input type="password" name="password" minlength="8" required>
+
+                    <button class="full">Criar minha conta</button>
+                </form>
+
+                <p class="muted">Já tem conta? <a href="{{ url_for('login') }}">Entrar</a></p>
+
+            {% else %}
+                <h1>Bem-vindo de volta</h1>
+                <p class="muted">Entre para acessar suas finanças.</p>
+
+                <form method="POST" action="{{ url_for('login') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <label>E-mail</label>
+                    <input type="email" name="email" required>
+
+                    <label>Senha</label>
+                    <input type="password" name="password" required>
+
+                    <button class="full">Entrar</button>
+                </form>
+
+                <p class="muted">Não tem conta? <a href="{{ url_for('register') }}">Cadastre-se</a></p>
+            {% endif %}
+
+        </section>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="alert {{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endwith %}
+    </main>
+
+{% else %}
+
+    <header>
+        <div class="brand">Finance<span>Pro</span></div>
+
+        <div>
+            <span class="muted">Olá, {{ current_user.name }}</span>
+            &nbsp; | &nbsp;
+            <a href="{{ url_for('history') }}">Histórico</a>
+            &nbsp; | &nbsp;
+            <a href="{{ url_for('export_csv') }}">Exportar CSV</a>
+
+            <form method="POST" action="{{ url_for('logout') }}" style="display:inline-block; margin-left:10px;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button>Sair</button>
+            </form>
+        </div>
+    </header>
+
+    <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="alert {{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endwith %}
+
+        {% if page == 'history' %}
+
+            <h1>Histórico de alterações</h1>
+            <p class="muted">Acompanhe as movimentações feitas na sua conta.</p>
+            <p><a href="{{ url_for('index') }}">← Voltar ao painel</a></p>
+
+            <section class="panel">
+                {% if logs %}
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr><th>Data</th><th>Ação</th><th>Detalhes</th></tr>
+                            </thead>
+                            <tbody>
+                                {% for log in logs %}
+                                    <tr>
+                                        <td>{{ log.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                                        <td>{{ log.action }}</td>
+                                        <td><pre style="white-space:pre-wrap; overflow-wrap:anywhere;">{{ log.details }}</pre></td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="empty">Nenhuma alteração registrada ainda.</p>
+                {% endif %}
+            </section>
+
+        {% else %}
+
+            <h1>Visão geral</h1>
+            <p class="muted">Controle suas receitas, despesas e movimentações.</p>
+
+            <section class="cards">
+                <div class="card">
+                    <small>Saldo realizado</small>
+                    <div class="amount {% if saldo >= 0 %}positive{% else %}negative{% endif %}">
+                        R$ {{ "%.2f"|format(saldo|float) }}
+                    </div>
+                </div>
+
+                <div class="card">
+                    <small>Receitas pagas</small>
+                    <div class="amount positive">R$ {{ "%.2f"|format(receita|float) }}</div>
+                </div>
+
+                <div class="card">
+                    <small>Despesas pagas</small>
+                    <div class="amount negative">R$ {{ "%.2f"|format(despesa|float) }}</div>
+                </div>
+
+                <div class="card">
+                    <small>Lançamentos pendentes</small>
+                    <div class="amount">{{ pendentes }}</div>
+                </div>
+            </section>
+
+            <div class="layout">
+
+                <section class="panel">
+                    <h2>Movimentações recentes</h2>
+
+                    {% if transactions %}
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Descrição</th>
+                                        <th>Tipo</th>
+                                        <th>Valor</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in transactions %}
+                                        <tr>
+                                            <td>
+                                                <strong>{{ item.description }}</strong><br>
+                                                <span class="muted">{{ item.category }}</span>
+                                                {% if item.due_date %}
+                                                    <br><span class="muted">{{ item.due_date.strftime('%d/%m/%Y') }}</span>
+                                                {% endif %}
+
+                                                <details style="margin-top:8px;">
+                                                    <summary>Editar</summary>
+                                                    <form method="POST" action="{{ url_for('edit_transaction', transaction_id=item.id) }}">
+                                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                                                        <label>Tipo</label>
+                                                        <select name="kind">
+                                                            <option value="receita" {% if item.kind == 'receita' %}selected{% endif %}>Receita</option>
+                                                            <option value="despesa" {% if item.kind == 'despesa' %}selected{% endif %}>Despesa</option>
+                                                        </select>
+
+                                                        <label>Descrição</label>
+                                                        <input name="description" value="{{ item.description }}" required>
+
+                                                        <label>Categoria</label>
+                                                        <input name="category" value="{{ item.category }}" required>
+
+                                                        <label>Valor</label>
+                                                        <input name="amount" value="{{ item.amount }}" required>
+
+                                                        <label>Vencimento</label>
+                                                        <input type="date" name="due_date" value="{{ item.due_date or '' }}">
+
+                                                        <label>Status</label>
+                                                        <select name="status">
+                                                            <option {% if item.status == 'Pago' %}selected{% endif %}>Pago</option>
+                                                            <option {% if item.status == 'Pendente' %}selected{% endif %}>Pendente</option>
+                                                        </select>
+
+                                                        <label>Observações</label>
+                                                        <textarea name="notes">{{ item.notes or '' }}</textarea>
+
+                                                        <button class="full">Salvar alterações</button>
+                                                    </form>
+                                                </details>
+
+                                                <form method="POST" action="{{ url_for('delete_transaction', transaction_id=item.id) }}" onsubmit="return confirm('Deseja excluir este lançamento?')" style="margin-top:8px;">
+                                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                    <button style="background:#48212e;color:#ffb5c0;">Excluir</button>
+                                                </form>
+                                            </td>
+
+                                            <td>{{ item.kind|capitalize }}</td>
+                                            <td class="{% if item.kind == 'receita' %}positive{% else %}negative{% endif %}">
+                                                R$ {{ "%.2f"|format(item.amount|float) }}
+                                            </td>
+                                            <td><span class="pill">{{ item.status }}</span></td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="empty">Você ainda não possui lançamentos financeiros.</p>
+                    {% endif %}
+                </section>
+
+                <section class="panel">
+                    <h2>Novo lançamento</h2>
+
+                    <form method="POST" action="{{ url_for('create_transaction') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                        <label>Tipo</label>
+                        <select name="kind" required>
+                            <option value="receita">Receita</option>
+                            <option value="despesa">Despesa</option>
+                        </select>
+
+                        <label>Descrição</label>
+                        <input name="description" maxlength="180" placeholder="Ex.: Venda de produto" required>
+
+                        <label>Categoria</label>
+                        <input name="category" maxlength="100" placeholder="Ex.: Vendas, aluguel" required>
+
+                        <label>Valor (ex.: 125,50)</label>
+                        <input name="amount" inputmode="decimal" placeholder="0,00" required>
+
+                        <div class="row">
+                            <div>
+                                <label>Vencimento</label>
+                                <input type="date" name="due_date">
+                            </div>
+                            <div>
+                                <label>Status</label>
+                                <select name="status">
+                                    <option>Pago</option>
+                                    <option>Pendente</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <label>Observações</label>
+                        <textarea name="notes" maxlength="2000" placeholder="Informações adicionais..."></textarea>
+
+                        <button class="full">Salvar lançamento</button>
+                    </form>
+                </section>
+
+            </div>
+        {% endif %}
+    </main>
+
+    <footer style="text-align:center; padding:30px; color:var(--muted);">
+        FinancePro · {{ current_year }} · Gestão financeira
+    </footer>
+
+{% endif %}
+
+</body>
+</html>
